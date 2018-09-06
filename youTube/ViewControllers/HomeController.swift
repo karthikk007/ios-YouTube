@@ -40,7 +40,7 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
             
             do {
                 let decoder = JSONDecoder()
-                let json = try decoder.decode([Video].self, from: data!)
+                let json = try decoder.decode([Video].self, from: content)
                 
                 self.videos = json
                 
