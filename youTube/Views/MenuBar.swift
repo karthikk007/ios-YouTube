@@ -25,6 +25,8 @@ class MenuBar: UIView, UICollectionViewDelegateFlowLayout, UICollectionViewDataS
         return cv
     }()
     
+    var horizontalBarLeftAnchorConstraint: NSLayoutConstraint?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
@@ -44,6 +46,31 @@ class MenuBar: UIView, UICollectionViewDelegateFlowLayout, UICollectionViewDataS
         
         let selectedIndexPath = IndexPath(item: 0, section: 0)
         collectionView.selectItem(at: selectedIndexPath, animated: true, scrollPosition: [])
+        
+        setupHorizontalBars()
+    }
+    
+    func setupHorizontalBars() {
+        let horizontalBarView = UIView()
+        horizontalBarView.backgroundColor = UIColor(white: 0.95, alpha: 1.0)
+        horizontalBarView.translatesAutoresizingMaskIntoConstraints = false
+        
+        addSubview(horizontalBarView)
+        
+        horizontalBarLeftAnchorConstraint = horizontalBarView.leftAnchor.constraint(equalTo: leftAnchor)
+        horizontalBarLeftAnchorConstraint?.isActive = true
+        horizontalBarView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        horizontalBarView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 1/4).isActive = true
+        horizontalBarView.heightAnchor.constraint(equalToConstant: 4).isActive = true
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let x = CGFloat(indexPath.item) * frame.width / 4
+        horizontalBarLeftAnchorConstraint?.constant = x
+        
+        UIView.animate(withDuration: 0.75, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
+            self.layoutIfNeeded()
+        }, completion: nil)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

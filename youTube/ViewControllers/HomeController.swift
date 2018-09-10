@@ -24,46 +24,13 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
         return launcher
     }()
     
-    func fetchVideos() {
-        let url = URL(string: "https://s3-us-west-2.amazonaws.com/youtubeassets/home.json")
-        URLSession.shared.dataTask(with: url!) { (data, response, error) in
-           
-            guard error == nil else {
-                print("error")
-                return
-            }
-            
-            guard let content = data else {
-                print("no data")
-                return
-            }
-            
-            do {
-                let decoder = JSONDecoder()
-                let json = try decoder.decode([Video].self, from: content)
-                
-                self.videos = json
-                
-                print(json)
-                
-                DispatchQueue.main.async {
-                    self.collectionView?.reloadData()
-                }
-                
-            } catch let error {
-                print(error)
-            }
-            
-        }.resume()
-    }
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
         fetchVideos()
-        
-        navigationItem.title = "Home"
         
         collectionView?.backgroundColor = UIColor.white
         
@@ -74,7 +41,7 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
         navigationController?.navigationBar.isTranslucent = false
         
         let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: view.frame.width - 32, height: view.frame.height))
-        titleLabel.text = "Home"
+        titleLabel.text = "  Home"
         titleLabel.textColor = UIColor.white
         titleLabel.font = UIFont.systemFont(ofSize: 20, weight: .medium)
         navigationItem.titleView = titleLabel
@@ -84,10 +51,21 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
     }
     
     private func setupMenuBar() {
+        navigationController?.hidesBarsOnSwipe = true
+        
+        let redView = UIView()
+        redView.backgroundColor = UIColor.red
+        view.addSubview(redView)
+        view.addConstraintsWithFormat(format: "H:|[v0]|", views: redView)
+        view.addConstraintsWithFormat(format: "V:[v0(50)]", views: redView)
+        
+        
         view.addSubview(menuBar)
         
         view.addConstraintsWithFormat(format: "H:|[v0]|", views: menuBar)
-        view.addConstraintsWithFormat(format: "V:|[v0(50)]", views: menuBar)
+        view.addConstraintsWithFormat(format: "V:[v0(50)]", views: menuBar)
+        
+        menuBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
     }
     
     private func setupNavBar() {
@@ -109,9 +87,16 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
         
     }
     
-    func showController(for setting: Setting) {
+    func fetchVideos() {
+        ApiService.sharedInstance.fetchVideos { (videos) in
+            self.videos = videos
+            self.collectionView?.reloadData()
+        }
+    }
+    
+    func showController(for setting: SettingType) {
         let vc = UIViewController()
-        vc.navigationItem.title = setting.name
+        vc.navigationItem.title = setting.description
         vc.view.backgroundColor = UIColor.white
         
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
