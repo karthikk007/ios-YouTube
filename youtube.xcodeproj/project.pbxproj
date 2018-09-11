@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		2535C3912146BBF900B912FE /* ApiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2535C3902146BBF900B912FE /* ApiService.swift */; };
 		2535C3932146C39800B912FE /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2535C3922146C39800B912FE /* FeedCell.swift */; };
+		2535C3952148050800B912FE /* TrendingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2535C3942148050800B912FE /* TrendingCell.swift */; };
+		2535C3972148087E00B912FE /* SubscriptionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2535C3962148087E00B912FE /* SubscriptionCell.swift */; };
 		2547383D213D589B00DCC139 /* SettingsLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2547383C213D589B00DCC139 /* SettingsLauncher.swift */; };
 		2547383F213D628E00DCC139 /* SettingsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2547383E213D628E00DCC139 /* SettingsCell.swift */; };
 		259F359D2138297C00AA9751 /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 259F359C2138297C00AA9751 /* Video.swift */; };
@@ -48,6 +50,8 @@
 /* Begin PBXFileReference section */
 		2535C3902146BBF900B912FE /* ApiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ApiService.swift; path = youTube/ApiService/ApiService.swift; sourceTree = SOURCE_ROOT; };
 		2535C3922146C39800B912FE /* FeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FeedCell.swift; path = youTube/Views/FeedCell.swift; sourceTree = SOURCE_ROOT; };
+		2535C3942148050800B912FE /* TrendingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingCell.swift; sourceTree = "<group>"; };
+		2535C3962148087E00B912FE /* SubscriptionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionCell.swift; sourceTree = "<group>"; };
 		2547383C213D589B00DCC139 /* SettingsLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsLauncher.swift; sourceTree = "<group>"; };
 		2547383E213D628E00DCC139 /* SettingsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsCell.swift; sourceTree = "<group>"; };
 		259F359C2138297C00AA9751 /* Video.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
@@ -188,6 +192,8 @@
 				259F35A02139B61000AA9751 /* CustomImageView.swift */,
 				2547383E213D628E00DCC139 /* SettingsCell.swift */,
 				2535C3922146C39800B912FE /* FeedCell.swift */,
+				2535C3942148050800B912FE /* TrendingCell.swift */,
+				2535C3962148087E00B912FE /* SubscriptionCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -334,9 +340,11 @@
 			files = (
 				25C7E2F4213802CB0072D9BF /* UIView+Extension.swift in Sources */,
 				25C7E2F2213802B20072D9BF /* VideoCell.swift in Sources */,
+				2535C3952148050800B912FE /* TrendingCell.swift in Sources */,
 				2547383F213D628E00DCC139 /* SettingsCell.swift in Sources */,
 				2547383D213D589B00DCC139 /* SettingsLauncher.swift in Sources */,
 				25C7E2C52137BDBB0072D9BF /* youtube.xcdatamodeld in Sources */,
+				2535C3972148087E00B912FE /* SubscriptionCell.swift in Sources */,
 				25C7E2BF2137BDBB0072D9BF /* HomeController.swift in Sources */,
 				25C7E2BD2137BDBB0072D9BF /* AppDelegate.swift in Sources */,
 				2535C3932146C39800B912FE /* FeedCell.swift in Sources */,

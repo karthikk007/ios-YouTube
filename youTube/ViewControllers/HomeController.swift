@@ -24,6 +24,8 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
     }()
     
     let cellId = "cellId"
+    let trendingCellId = "TrendingCellId"
+    let subscriptionCellId = "SubscriptionCellId"
     
     let titles = ["Home", "Trending", "Subscriptions", "Account"]
 
@@ -32,10 +34,6 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
         // Do any additional setup after loading the view, typically from a nib.
         
         collectionView?.backgroundColor = UIColor.white
-        
-//        collectionView?.register(FeedCell.self, forCellWithReuseIdentifier: "CellId")
-//        collectionView?.contentInset = UIEdgeInsets(top: 50, left: 0, bottom: 0, right: 0)
-//        collectionView?.scrollIndicatorInsets = UIEdgeInsets(top: 50, left: 0, bottom: 0, right: 0)
         
         navigationController?.navigationBar.isTranslucent = false
         
@@ -57,6 +55,8 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
         }
         
         collectionView?.register(FeedCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView?.register(TrendingCell.self, forCellWithReuseIdentifier: trendingCellId)
+        collectionView?.register(SubscriptionCell.self, forCellWithReuseIdentifier: subscriptionCellId)
         
         collectionView?.backgroundColor = UIColor.white
         collectionView?.contentInset = UIEdgeInsetsMake(50, 0, 0, 0)
@@ -136,7 +136,18 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath)
+        
+        let identifier: String
+        
+        if indexPath.item == 1 {
+            identifier = trendingCellId
+        } else if indexPath.item == 2 {
+            identifier = subscriptionCellId
+        } else {
+            identifier = cellId
+        }
+        
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath)
         return cell
     }
     
