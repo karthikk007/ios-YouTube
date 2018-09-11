@@ -26,6 +26,28 @@ class VideoPlayerView: UIView {
         return view
     }()
     
+    let videoLengthLabel: UILabel = {
+        let label = UILabel()
+        label.text = "00:00"
+        label.textColor = UIColor.white
+        label.font = UIFont.boldSystemFont(ofSize: 14)
+        label.textAlignment = .right
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    let videoSlider: UISlider = {
+        let slider = UISlider()
+        slider.translatesAutoresizingMaskIntoConstraints = false
+        slider.minimumTrackTintColor = UIColor.red
+        slider.maximumTrackTintColor = UIColor.white
+        slider.setThumbImage(UIImage(named: "thumb"), for: .normal)
+        
+        slider.addTarget(self, action: #selector(handleSliderChange), for: .valueChanged)
+        
+        return slider
+    }()
+    
     lazy var pausePlayButton: UIButton = {
         let button = UIButton(type: .system)
         let image = UIImage(named: "pause")
@@ -60,6 +82,18 @@ class VideoPlayerView: UIView {
         pausePlayButton.widthAnchor.constraint(equalToConstant: 50).isActive = true
         pausePlayButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
+        controlsContainerView.addSubview(videoLengthLabel)
+        videoLengthLabel.rightAnchor.constraint(equalTo: controlsContainerView.rightAnchor, constant: -8).isActive = true
+        videoLengthLabel.bottomAnchor.constraint(equalTo: controlsContainerView.bottomAnchor).isActive = true
+        videoLengthLabel.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        videoLengthLabel.heightAnchor.constraint(equalToConstant: 24).isActive = true
+        
+        controlsContainerView.addSubview(videoSlider)
+        videoSlider.rightAnchor.constraint(equalTo: videoLengthLabel.leftAnchor).isActive = true
+        videoSlider.bottomAnchor.constraint(equalTo: controlsContainerView.bottomAnchor).isActive = true
+        videoSlider.leftAnchor.constraint(equalTo: controlsContainerView.leftAnchor).isActive = true
+        videoSlider.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        
         addSubview(controlsContainerView)
         
         backgroundColor = UIColor.black
@@ -77,24 +111,36 @@ class VideoPlayerView: UIView {
             self.layer.addSublayer(playerLayer)
             playerLayer.frame = frame
             
-            player?.play()
-            
             player?.addObserver(self, forKeyPath: "currentItem.status", options: .new, context: &playerItemContext)
+            player?.addObserver(self, forKeyPath: "currentItem.loadedTimeRanges", options: .new, context: nil)
         }
 
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        
+        if keyPath == "currentItem.loadedTimeRanges" {
+            if let duration = player?.currentItem?.duration {
+                let seconds = CMTimeGetSeconds(duration)
+                
+                let seconsText = Int(seconds) % 60
+                let minutesText = Int(seconds) / 60
+                videoLengthLabel.text = "\(String(format: "%02d", minutesText)):\(String(format: "%02d", seconsText))"
+            }
+        }
+        
         if keyPath == "currentItem.status" {
             
             // Only handle observations for the playerItemContext
-            guard context == &playerItemContext else {
+	            guard context == &playerItemContext else {
                 super.observeValue(forKeyPath: keyPath,
                                    of: object,
                                    change: change,
                                    context: context)
                 return
             }
+            
+
             
             if keyPath == "currentItem.status" {
                 let status: AVPlayerItemStatus
@@ -120,6 +166,22 @@ class VideoPlayerView: UIView {
         }
         
         
+    }
+    
+    @objc func handleSliderChange() {
+        
+        if let duration = player?.currentItem?.duration {
+            let totalSeconds = CMTimeGetSeconds(duration)
+            let value = Float64(videoSlider.value) * totalSeconds
+            
+            let seekTime = CMTime(value: Int64(value), timescale: 1)
+            
+            player?.seek(to: seekTime, completionHandler: { (completed) in
+                // do something
+            })
+        }
+        
+
     }
     
     @objc func handlePause() {
