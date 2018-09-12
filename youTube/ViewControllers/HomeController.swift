@@ -11,12 +11,11 @@ import Foundation
 
 class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
-    let menuBar: MenuBar = {
+    lazy var menuBar: MenuBar = {
         let mb = MenuBar()
+        mb.homeController = self
         return mb
     }()
-    
-    var videos: [Video]?
     
     lazy var settingsLauncher: SettingsLauncher = {
         let launcher = SettingsLauncher()
@@ -24,70 +23,70 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
         return launcher
     }()
     
-    func fetchVideos() {
-        let url = URL(string: "https://s3-us-west-2.amazonaws.com/youtubeassets/home.json")
-        URLSession.shared.dataTask(with: url!) { (data, response, error) in
-           
-            guard error == nil else {
-                print("error")
-                return
-            }
-            
-            guard let content = data else {
-                print("no data")
-                return
-            }
-            
-            do {
-                let decoder = JSONDecoder()
-                let json = try decoder.decode([Video].self, from: content)
-                
-                self.videos = json
-                
-                print(json)
-                
-                DispatchQueue.main.async {
-                    self.collectionView?.reloadData()
-                }
-                
-            } catch let error {
-                print(error)
-            }
-            
-        }.resume()
-    }
+    let cellId = "cellId"
+    let trendingCellId = "TrendingCellId"
+    let subscriptionCellId = "SubscriptionCellId"
+    
+    let titles = ["Home", "Trending", "Subscriptions", "Account"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        fetchVideos()
-        
-        navigationItem.title = "Home"
-        
         collectionView?.backgroundColor = UIColor.white
-        
-        collectionView?.register(VideoCell.self, forCellWithReuseIdentifier: "CellId")
-        collectionView?.contentInset = UIEdgeInsets(top: 50, left: 0, bottom: 0, right: 0)
-        collectionView?.scrollIndicatorInsets = UIEdgeInsets(top: 50, left: 0, bottom: 0, right: 0)
         
         navigationController?.navigationBar.isTranslucent = false
         
         let titleLabel = UILabel(frame: CGRect(x: 0, y: 0, width: view.frame.width - 32, height: view.frame.height))
-        titleLabel.text = "Home"
+        titleLabel.text = "  Home"
         titleLabel.textColor = UIColor.white
         titleLabel.font = UIFont.systemFont(ofSize: 20, weight: .medium)
         navigationItem.titleView = titleLabel
         
+        setupCollectionView()
         setupMenuBar()
         setupNavBar()
     }
     
+    private func setupCollectionView() {
+        if let flowLayout = collectionView?.collectionViewLayout as? UICollectionViewFlowLayout {
+            flowLayout.scrollDirection = .horizontal
+            flowLayout.minimumLineSpacing = 0
+        }
+        
+        collectionView?.register(FeedCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView?.register(TrendingCell.self, forCellWithReuseIdentifier: trendingCellId)
+        collectionView?.register(SubscriptionCell.self, forCellWithReuseIdentifier: subscriptionCellId)
+        
+        collectionView?.backgroundColor = UIColor.white
+        collectionView?.contentInset = UIEdgeInsetsMake(50, 0, 0, 0)
+        collectionView?.scrollIndicatorInsets = UIEdgeInsetsMake(50, 0, 0, 0)
+        
+        collectionView?.isPagingEnabled = true
+    }
+    
     private func setupMenuBar() {
+        navigationController?.hidesBarsOnSwipe = true
+        
+        let redView = UIView()
+        redView.backgroundColor = UIColor.red
+        view.addSubview(redView)
+        view.addConstraintsWithFormat(format: "H:|[v0]|", views: redView)
+        view.addConstraintsWithFormat(format: "V:[v0(50)]", views: redView)
+        
+        
         view.addSubview(menuBar)
         
         view.addConstraintsWithFormat(format: "H:|[v0]|", views: menuBar)
-        view.addConstraintsWithFormat(format: "V:|[v0(50)]", views: menuBar)
+        view.addConstraintsWithFormat(format: "V:[v0(50)]", views: menuBar)
+        
+        menuBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+    }
+    
+    private func setTitle(for index: Int) {
+        if let titleLabel = navigationItem.titleView as? UILabel {
+            titleLabel.text = "  \(titles[index])"
+        }
     }
     
     private func setupNavBar() {
@@ -106,12 +105,20 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
     }
     
     @objc func handleSearch() {
-        
+        scrollToMenuIndex(index: 2)
     }
     
-    func showController(for setting: Setting) {
+    func scrollToMenuIndex(index: Int) {
+        let indexPath = IndexPath(item: index, section: 0)
+        collectionView?.scrollToItem(at: indexPath, at: [], animated: true)
+        
+        setTitle(for: index)
+    }
+    
+    
+    func showController(for setting: SettingType) {
         let vc = UIViewController()
-        vc.navigationItem.title = setting.name
+        vc.navigationItem.title = setting.description
         vc.view.backgroundColor = UIColor.white
         
         navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.white]
@@ -123,28 +130,42 @@ class HomeController: UICollectionViewController, UICollectionViewDelegateFlowLa
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
+    
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if let count = videos?.count {
-            return count
-        }
-        return 0
+        return 4
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CellId", for: indexPath) as! VideoCell
         
-        cell.video = videos?[indexPath.item]
+        let identifier: String
+        
+        if indexPath.item == 1 {
+            identifier = trendingCellId
+        } else if indexPath.item == 2 {
+            identifier = subscriptionCellId
+        } else {
+            identifier = cellId
+        }
+        
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identifier, for: indexPath)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let height = (view.frame.width - 16 - 16) * 9 / 16
-        return CGSize(width: view.frame.width, height: height + 16 + 88)
+        return CGSize(width: view.frame.width, height: view.frame.height - 50)
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        menuBar.horizontalBarLeftAnchorConstraint?.constant = scrollView.contentOffset.x / 4
+    }
+    
+    override func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        let index = targetContentOffset.pointee.x / view.frame.width
+        
+        let indexPath = IndexPath(item: Int(index), section: 0)
+        menuBar.collectionView.selectItem(at: indexPath, animated: true, scrollPosition: [])
+        
+        setTitle(for: Int(index))
     }
 }
 
