@@ -1,14 +1,15 @@
-# ios-youtube
+# Clone That App - YouTube
 
 Clone That App - YouTube
 
 ## App Preview
 https://youtu.be/xvxVnp1p3Hg
 
-### Custom Status Bar
-### Custom Navigation Bar
-### Custom Menu Bar
-### AVPlayer and Controls
+## Featuring
+  ### Custom Status Bar
+  ### Custom Navigation Bar
+  ### Custom Menu Bar
+  ### AVPlayer and Controls
 
 
 
